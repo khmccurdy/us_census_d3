@@ -1,0 +1,31 @@
+.tooltip {
+  position: absolute;
+  /* width: 135px; */
+  /* height: 60px; */
+  padding: 8px;
+  padding-bottom: 5px; 
+  font: 12px sans-serif;
+  color: white;
+  text-align: center;
+  background: #00333b;
+  border: 0;
+  border-radius: 0px;
+}
+
+.axisText {
+  font-family: sans-serif;
+  /* font-weight: bold; */
+  text-anchor: middle;
+}
+
+.pointText {
+  font-size: 14px;
+  font-family: sans-serif;
+  font-weight: bold;
+  text-anchor: middle;
+}
+
+iframe{
+  border: none;
+  margin: 0px;
+}
