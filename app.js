@@ -34,7 +34,7 @@ var $svg = d3.select(".chart")
 var $chartGroup = $svg.append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-var abbr = [];
+var k = {}; // Keys object
 d3.csv(dataPath, (error, response)=>{
     if(error) throw error;
     
@@ -49,17 +49,15 @@ d3.csv(dataPath, (error, response)=>{
     
     var xTags = ["High School Completion", "Poverty", "Disability Employment", "White-Collar"];
     var yTags = ["Good Health", "Doctor too Expensive", "Obesity"]
-
-    for (var i=0;i<keyList.length;i++){
-        let key = keyList[i];
-        
-        eval(`var ${key} = response.map(x=>x.${key})`);
+    
+    for (let key of keyList){
+        k[key] = response.map(x=>x[key]);
     }
     var chooseX = 0;
     var chooseY = 0;
-
-    var xData = eval(xChoices[chooseX]).map(d=>+d);
-    var yData = eval(yChoices[chooseY]).map(d=>+d);
+    
+    var xData = k[xChoices[chooseX]].map(d=>+d);
+    var yData = k[yChoices[chooseY]].map(d=>+d);
 
     var xScale = d3.scaleLinear()
         .domain(buffer(d3.extent(xData),xBuffer))
@@ -69,7 +67,7 @@ d3.csv(dataPath, (error, response)=>{
         .domain(buffer(d3.extent(yData),yBuffer))
         .range([height, 0]);
 
-    var xyData = xData.map((d,i)=>[d,yData[i],abbr[i]]);
+    var xyData = xData.map((d,i)=>[d,yData[i],k.abbr[i]]);
 
     var xAxis = d3.axisBottom(xScale)
     var yAxis = d3.axisLeft(yScale)
@@ -141,7 +139,7 @@ d3.csv(dataPath, (error, response)=>{
         .attr("class","tooltip")
         .offset([-10,30])
         .html((d,i)=>{
-            return `<strong>${state[i]}</strong>
+            return `<strong>${k.state[i]}</strong>
                 <br>${xTags[chooseX]}: ${d[0].toFixed(1)} %
                 <br>${yTags[chooseY]}: ${d[1].toFixed(1)} %`
             })
@@ -187,8 +185,8 @@ d3.csv(dataPath, (error, response)=>{
                 .classed("activeAxis", (d,i)=>i==chooseX)
                 .attr("fill", (d,i)=>(i==chooseX?labelColorActive:labelColorInactive))
                 .style("font-weight", (d,i)=>(i==chooseX?"bold":""))
-            // console.log(chooseX);
-            xData = eval(xChoices[chooseX]).map(d=>+d);
+
+            xData = k[xChoices[chooseX]].map(d=>+d);
 
             xScale = d3.scaleLinear()
                 .domain(buffer(d3.extent(xData),xBuffer))
@@ -204,7 +202,7 @@ d3.csv(dataPath, (error, response)=>{
                 .attr("fill", (d,i)=>(i==chooseY?labelColorActive:labelColorInactive))
                 .style("font-weight", (d,i)=>(i==chooseY?"bold":""))
 
-            yData = eval(yChoices[chooseY]).map(d=>+d);
+            yData = k[yChoices[chooseY]].map(d=>+d);
 
             yScale = d3.scaleLinear()
                 .domain(buffer(d3.extent(yData),yBuffer))
@@ -214,7 +212,7 @@ d3.csv(dataPath, (error, response)=>{
             d3.select("#yAxis").transition().duration(graphDuration).call(yAxis);
         }
 
-        xyData = xData.map((d,i)=>[d,yData[i],abbr[i]]);
+        xyData = xData.map((d,i)=>[d,yData[i],k.abbr[i]]);
 
         $dataPoints.data(xyData)
             .transition()
